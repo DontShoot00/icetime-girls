@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f1d2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ice Time">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="description" content="Learn where to be on the ice, practice drills, and learn the rules of hockey.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Ice Time Hockey Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout idea: a scoreboard-style header, then one big interactive rink with a side panel; drills as a grid of diagram cards. */
+  --bg:#eef3f7;
+  --surface:#ffffff;
+  --ink:#0f1d2e;
+  --muted:#56677a;
+  --line:#d3dde7;
+  --accent:#d92f49;   /* goal-light red: forwards */
+  --navy:#1f4fa3;     /* blue line: defense */
+  --gold:#d9930f;     /* goalie */
+  --chip:#e3eaf1;
+  --ice:#f6fafd;
+  --ice-line:#c7d6e4;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1520; --surface:#14212f; --ink:#e7eef6; --muted:#9db0c4; --line:#253649;
+    --accent:#ff5a70; --navy:#6c9bf5; --gold:#f2b440; --chip:#1d2d3f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1520; --surface:#14212f; --ink:#e7eef6; --muted:#9db0c4; --line:#253649;
+  --accent:#ff5a70; --navy:#6c9bf5; --gold:#f2b440; --chip:#1d2d3f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.05;letter-spacing:.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--navy);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* Header */
+header{background:var(--ink);color:var(--bg);padding:22px 0 0}
+:root[data-theme="dark"] header{background:#060c13;color:var(--ink)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) header{background:#060c13;color:var(--ink)}}
+.brand{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand h1{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:800;text-transform:uppercase}
+.brand h1 span{color:var(--accent)}
+.brand p{margin:4px 0 0;opacity:.8;max-width:52ch}
+.stripe{height:6px;background:linear-gradient(90deg,var(--accent) 0 33%,transparent 33% 36%,var(--navy) 36% 100%);margin-top:18px}
+nav{display:flex;gap:4px;margin-top:18px;overflow-x:auto}
+nav a{font-family:var(--display);font-weight:700;font-size:1.25rem;text-transform:uppercase;letter-spacing:.04em;
+  color:inherit;text-decoration:none;padding:10px 18px;border-radius:10px 10px 0 0;opacity:.7;white-space:nowrap}
+nav a[aria-current="page"]{background:var(--bg);color:var(--ink);opacity:1}
+nav a:hover{opacity:1}
+
+main.wrap{padding:30px 20px 60px}
+.view{display:none}
+.view.on{display:block}
+.lede{color:var(--muted);max-width:68ch;margin:6px 0 18px}
+.sec-title{font-size:2rem;font-weight:800;text-transform:uppercase}
+
+/* Situation picker */
+.sits{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chipbtn{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 16px;font-weight:700}
+.chipbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chipbtn:hover{border-color:var(--ink)}
+
+.rinkgrid{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(280px,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.rinkgrid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.rinkcard{padding:14px}
+.rinkhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.rinkhead h2{font-size:1.7rem;text-transform:uppercase}
+.rinkhead .ctrls{display:flex;gap:6px;align-items:center}
+.iconbtn{border:1px solid var(--line);background:var(--chip);border-radius:10px;padding:6px 12px;font-weight:700}
+.iconbtn:hover{border-color:var(--ink)}
+.sitdesc{margin:0 0 10px;color:var(--muted)}
+.svgbox{overflow-x:auto}
+svg.rink{width:100%;height:auto;display:block;min-width:520px}
+.toggle{display:flex;align-items:center;gap:8px;font-size:.95rem;color:var(--muted)}
+.toggle input{width:18px;height:18px;accent-color:var(--navy)}
+
+/* rink drawing */
+.ice{fill:var(--ice);stroke:#7d8fa3;stroke-width:1.2}
+.gl{stroke:#d6334a;stroke-width:.6}
+.rl{stroke:#d6334a;stroke-width:1.4}
+.bl{stroke:#2b5fb8;stroke-width:1.8}
+.fc{fill:none;stroke:#d6334a;stroke-width:.5}
+.fcb{fill:none;stroke:#2b5fb8;stroke-width:.5}
+.dot{fill:#d6334a}
+.crease{fill:#cfe4f7;stroke:#d6334a;stroke-width:.5}
+.net{fill:none;stroke:#9aa6b3;stroke-width:.7}
+.zonelbl{font-family:var(--display);font-weight:700;font-size:3.6px;fill:#8293a6;letter-spacing:.15em;text-transform:uppercase}
+
+.pl{cursor:pointer;transition:transform .8s cubic-bezier(.5,0,.2,1)}
+.pl circle.body{stroke:#fff;stroke-width:.8}
+.pl text{font-family:var(--display);font-weight:800;font-size:3.6px;fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.pl .halo{fill:none;stroke:var(--ink);stroke-width:.9;opacity:0;transition:opacity .2s}
+:root .pl .halo{stroke:#0f1d2e}
+.pl.sel .halo{opacity:1}
+.pl.dim{opacity:.7}
+.puck{transition:transform .8s cubic-bezier(.5,0,.2,1)}
+.opp{fill:#ffffff;stroke:#7b8796;stroke-width:.7;stroke-dasharray:1.2 .8;transition:opacity .4s}
+.opptxt{font-family:var(--display);font-size:3px;fill:#7b8796;text-anchor:middle;dominant-baseline:central;font-weight:700}
+.arrow{fill:none;stroke-width:.9;stroke-linecap:round}
+.arrow.skate{stroke:#0f1d2e}
+.arrow.pass{stroke:#2b5fb8;stroke-dasharray:2 1.4}
+.arrow.shot{stroke:#d6334a;stroke-width:1.2}
+.arrow.dim{opacity:.25}
+.arrows{transition:opacity .3s}
+.arrows.hide{opacity:0}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.88rem;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:50%;display:inline-block}
+.ln{width:22px;height:0;border-top:2.5px solid;display:inline-block}
+
+.posrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.posbtn{border:2px solid transparent;border-radius:10px;padding:6px 12px;font-family:var(--display);font-weight:800;font-size:1.1rem;color:#fff;min-width:48px}
+.posbtn[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--surface) inset}
+.F{background:var(--accent)} .D{background:var(--navy)} .G{background:var(--gold)}
+
+/* Side panel */
+.panel{padding:18px 20px}
+.panel .tag{display:inline-block;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.85rem;padding:2px 10px;border-radius:999px;color:#fff}
+.panel h3{font-size:2.1rem;text-transform:uppercase;margin:8px 0 2px}
+.panel .where{color:var(--muted);margin:0 0 14px;font-size:.95rem}
+.panel h4{font-family:var(--display);font-size:1.05rem;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 4px;color:var(--muted)}
+.panel p{margin:0}
+.panel .now{font-size:1.08rem}
+.panel ul{margin:4px 0 0;padding-left:20px}
+.panel .remember{margin-top:14px;padding:10px 12px;border-left:4px solid var(--accent);background:var(--chip);border-radius:0 10px 10px 0;font-weight:700}
+
+/* Position overview */
+.posgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;margin-top:28px}
+.poscard{padding:16px 18px;border-top:6px solid}
+.poscard h3{font-size:1.5rem;text-transform:uppercase}
+.poscard p{margin:6px 0 0;color:var(--muted)}
+.poscard .skills{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.poscard .skills span{font-size:.8rem;background:var(--chip);padding:2px 9px;border-radius:999px}
+
+/* Drills */
+.drillbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.progress{display:flex;align-items:center;gap:10px;font-weight:700}
+.pbar{width:160px;height:10px;background:var(--chip);border-radius:999px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+.drillgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:16px}
+@media (max-width:400px){.drillgrid{grid-template-columns:1fr}}
+.drill{display:flex;flex-direction:column;overflow:hidden}
+.drill svg{width:100%;height:190px;display:block;background:var(--chip);padding:6px}
+.drill .db{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.drill h3{font-size:1.5rem;text-transform:uppercase}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:.78rem;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--chip)}
+.pill.lv-b{background:#d8f1e0;color:#155c2f}
+.pill.lv-i{background:#fde9c7;color:#7a4b00}
+.pill.lv-a{background:#f8d2d9;color:#8a1328}
+.filters{display:flex;flex-direction:column;gap:8px}
+.filters .sits{margin:0}
+.chipbtn.sm{padding:4px 12px;font-size:.9rem}
+.drill ol{margin:0;padding-left:20px}
+.drill ol li{margin-bottom:3px}
+.drill .tips{background:var(--chip);border-radius:10px;padding:8px 12px;font-size:.93rem}
+.drill .tips b{font-family:var(--display);text-transform:uppercase;letter-spacing:.05em}
+.done{margin-top:auto;display:flex;align-items:center;gap:8px;font-weight:700;padding-top:6px}
+.done input{width:20px;height:20px;accent-color:var(--accent)}
+.drill.isdone{border-color:var(--accent)}
+.dl-skate{stroke:#0f1d2e} .dl-pass{stroke:#2b5fb8;stroke-dasharray:2.4 1.6} .dl-shot{stroke:#d6334a;stroke-width:1.5}
+.dl-back{stroke:#0f1d2e;stroke-dasharray:.3 1.6;stroke-width:1.3}
+.dl{fill:none;stroke-width:1.1;stroke-linecap:round}
+.cone{fill:#f28c28;stroke:#a85500;stroke-width:.3}
+
+/* Rules */
+.rulegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:16px}
+.rule{padding:18px 20px}
+.rule h3{font-size:1.6rem;text-transform:uppercase}
+.rule p{margin:8px 0 0}
+.rule .tip{margin-top:10px;font-weight:700;color:var(--accent)}
+.rule svg{width:100%;height:auto;margin-top:10px;border-radius:8px}
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px 22px;margin-top:14px}
+.gloss div{border-bottom:1px solid var(--line);padding:8px 0}
+.gloss b{font-family:var(--display);font-size:1.2rem;text-transform:uppercase;letter-spacing:.03em;display:block}
+.gloss span{color:var(--muted);font-size:.95rem}
+footer{color:var(--muted);font-size:.85rem;padding:10px 0 40px}
+
+.short{display:none}
+button,a,.pl,label{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+svg.rink.vert{min-width:0;width:auto;height:min(68vh,600px);max-width:100%;margin:0 auto}
+.vert .pl text{font-size:4.6px}
+.vert .opptxt{font-size:3.6px}
+@media (max-width:640px){
+  .wrap{padding:0 14px}
+  main.wrap{padding:20px 14px 48px}
+  header{padding-top:16px}
+  .brand h1{font-size:2.1rem}
+  .brand p{font-size:.95rem}
+  nav{margin-top:14px}
+  nav a{font-size:1.1rem;padding:9px 14px}
+  .long{display:none} .short{display:inline}
+  .sec-title{font-size:1.7rem}
+  .chipbtn{padding:7px 13px;font-size:.95rem}
+  .rinkcard{padding:12px}
+  .rinkhead h2{font-size:1.45rem}
+  .svgbox{overflow:visible}
+  .legend{gap:8px 14px;font-size:.82rem}
+  .posrow{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+  .posbtn{min-width:0;padding:9px 0;font-size:1.15rem}
+  .panel{padding:16px}
+  .panel h3{font-size:1.8rem}
+  .drillbar{flex-direction:column;align-items:stretch}
+  .progress{justify-content:space-between}
+  .pbar{flex:1}
+  .drill h3{font-size:1.35rem}
+  .rule{padding:16px}
+  .rule h3{font-size:1.4rem}
+}
+.installbtn{display:none;align-items:center;gap:8px;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:10px 18px;font-weight:700;font-size:1rem;margin-bottom:4px}
+.installbtn.show{display:inline-flex}
+.installbtn:hover{filter:brightness(1.08)}
+.sheet{position:fixed;inset:0;background:rgba(6,12,19,.6);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:16px}
+.sheet.show{display:flex}
+.sheet .box{background:var(--surface);color:var(--ink);border-radius:18px;max-width:420px;width:100%;padding:22px 22px 18px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.sheet h2{font-size:1.7rem;text-transform:uppercase}
+.sheet ol{margin:12px 0 16px;padding-left:22px}
+.sheet li{margin-bottom:8px}
+.sheet .shareico{display:inline-block;vertical-align:-4px;width:20px;height:20px}
+.sheet .close{width:100%;border:0;background:var(--ink);color:var(--bg);border-radius:12px;padding:12px;font-weight:700}
+@media (prefers-reduced-motion: reduce){
+  .pl,.puck,.pbar i,.arrows{transition:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div>
+        <h1>Ice Time <span>Playbook</span></h1>
+        <p>Learn where to be, what to do, and how to practice. Hockey for girls who are just getting started.</p>
+      </div>
+      <button class="installbtn" id="installBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Install app</button>
+    </div>
+    <nav aria-label="Sections">
+      <a href="#positions" data-view="positions"><span class="long">Positions on the Ice</span><span class="short">Positions</span></a>
+      <a href="#drills" data-view="drills">Drills</a>
+      <a href="#rules" data-view="rules"><span class="long">Rules &amp; Hockey Words</span><span class="short">Rules</span></a>
+    </nav>
+  </div>
+  <div class="stripe" style="margin-top:0"></div>
+</header>
+
+<main class="wrap">
+  <!-- POSITIONS -->
+  <section class="view" id="v-positions">
+    <h2 class="sec-title">Where do I go?</h2>
+    <p class="lede">Pick a game situation, then tap any player to see her job. Your team is the colored circles and always attacks the net on the <span class="long">right</span><span class="short">top</span>. The dashed gray circles are the other team.</p>
+
+    <div class="sits" id="sits" role="group" aria-label="Game situation"></div>
+
+    <div class="rinkgrid">
+      <div class="card rinkcard">
+        <div class="rinkhead">
+          <h2 id="sitName">Faceoff</h2>
+          <div class="ctrls">
+            <button class="iconbtn" id="prevSit" aria-label="Previous situation">&larr; Prev</button>
+            <button class="iconbtn" id="nextSit" aria-label="Next situation">Next &rarr;</button>
+          </div>
+        </div>
+        <p class="sitdesc" id="sitDesc"></p>
+        <div class="svgbox"><svg class="rink" id="rink" viewBox="-3 -7 206 95" role="img" aria-label="Hockey rink showing player positions"></svg></div>
+        <div class="legend">
+          <span><i class="sw F"></i>Forwards</span>
+          <span><i class="sw D"></i>Defense</span>
+          <span><i class="sw G"></i>Goalie</span>
+          <span><i class="ln" style="border-color:var(--ink)"></i>Skate</span>
+          <span><i class="ln" style="border-color:#2b5fb8;border-top-style:dashed"></i>Pass</span>
+          <span><i class="ln" style="border-color:#d6334a"></i>Shot</span>
+          <label class="toggle"><input type="checkbox" id="showArrows" checked> Show moves</label>
+        </div>
+        <div class="posrow" id="posrow" role="group" aria-label="Choose a position"></div>
+      </div>
+
+      <aside class="card panel" id="panel" aria-live="polite"></aside>
+    </div>
+
+    <div class="posgrid" id="posgrid"></div>
+  </section>
+
+  <!-- DRILLS -->
+  <section class="view" id="v-drills">
+    <h2 class="sec-title">Drills</h2>
+    <p class="lede">Practice drills with a diagram, steps, and coaching tips for each. Start with the green Beginner drills, move up to Intermediate, then take on the red Advanced drills when you're ready. Check off a drill when you can do it well.</p>
+    <div class="drillbar">
+      <div class="filters"><div class="sits" id="cats" role="group" aria-label="Drill type"></div><div class="sits" id="levels" role="group" aria-label="Drill level"></div></div>
+      <div class="progress"><span id="doneCount">0 of 0 done</span><div class="pbar"><i id="pfill"></i></div></div>
+    </div>
+    <div class="legend" style="margin:0 0 14px">
+      <span><i class="ln" style="border-color:var(--ink)"></i>Skate forward</span>
+      <span><i class="ln" style="border-color:var(--ink);border-top-style:dotted"></i>Skate backward</span>
+      <span><i class="ln" style="border-color:#2b5fb8;border-top-style:dashed"></i>Pass</span>
+      <span><i class="ln" style="border-color:#d6334a"></i>Shot</span>
+      <span><i class="sw" style="background:#f28c28"></i>Cone</span>
+    </div>
+    <div class="drillgrid" id="drillgrid"></div>
+  </section>
+
+  <!-- RULES -->
+  <section class="view" id="v-rules">
+    <h2 class="sec-title">Rules you need to know</h2>
+    <p class="lede">The basic rules that come up in every game, explained simply. Your league may have a few extra rules for your age group, so ask your coach.</p>
+    <div class="rulegrid" id="rulegrid"></div>
+    <h2 class="sec-title" style="margin-top:36px">Hockey words</h2>
+    <p class="lede">Words you'll hear from coaches and teammates on the bench.</p>
+    <div class="gloss" id="gloss"></div>
+  </section>
+</main>
+<div class="sheet" id="iosSheet" role="dialog" aria-modal="true" aria-labelledby="iosTitle">
+  <div class="box">
+    <h2 id="iosTitle">Put Ice Time on your phone</h2>
+    <ol>
+      <li>Tap the <b>Share</b> button <svg class="shareico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M5 12v8h14v-8"/></svg> at the bottom (or top) of Safari.</li>
+      <li>Scroll down and tap <b>Add to Home Screen</b>.</li>
+      <li>Tap <b>Add</b>. Ice Time shows up on your home screen like any other app, and it works at the rink even with no signal.</li>
+    </ol>
+    <button class="close" id="iosClose" type="button">Got it</button>
+  </div>
+</div>
+<footer class="wrap">Positions shown are one common way to play each situation. Coaches use different systems, so always follow your coach's plan.</footer>
+
+<script>
+/* ---------- Data ---------- */
+const POS = {
+  C:{name:"Center",short:"C",g:"F",side:"Middle of the ice",
+     role:"The middle of everything. She takes faceoffs, helps on defense in her own end, and supports the puck everywhere.",
+     skills:["Faceoffs","Passing","Two-way skating","Seeing the ice"],
+     remember:"Be where the puck needs help."},
+  LW:{name:"Left Wing",short:"LW",g:"F",side:"Left side of the ice",
+     role:"A forward who plays up and down the left side. She scores goals, wins puck battles on the boards, and covers the point on defense.",
+     skills:["Shooting","Speed","Board battles","Catching passes"],
+     remember:"Stay in your lane. Use the whole left side."},
+  RW:{name:"Right Wing",short:"RW",g:"F",side:"Right side of the ice",
+     role:"A forward who plays up and down the right side. Same job as the left wing, on the other side of the ice.",
+     skills:["Shooting","Speed","Board battles","Catching passes"],
+     remember:"Stay in your lane. Use the whole right side."},
+  LD:{name:"Left Defense",short:"LD",g:"D",side:"Left side, behind the forwards",
+     role:"The last skater before the goalie on the left side. She skates backward well, makes the first pass out, and shoots from the blue line.",
+     skills:["Backward skating","First pass","Shots from the point","Staying calm"],
+     remember:"Nobody gets behind you."},
+  RD:{name:"Right Defense",short:"RD",g:"D",side:"Right side, behind the forwards",
+     role:"The last skater before the goalie on the right side. Same job as the left defense, on the other side of the ice.",
+     skills:["Backward skating","First pass","Shots from the point","Staying calm"],
+     remember:"Nobody gets behind you."},
+  G:{name:"Goalie",short:"G",g:"G",side:"In the crease",
+     role:"She stops the puck. She can see the whole ice, so she's also the team's loudest voice, calling out what she sees.",
+     skills:["Ready stance","Tracking the puck","Side-to-side movement","Talking"],
+     remember:"Eyes on the puck. Always."}
+};
+const ORDER = ["LW","C","RW","LD","RD","G"];
+
+const SITS = [
+ {id:"faceoff",name:"Faceoff",
+  desc:"Every period starts here. The referee drops the puck between the two centers, and everyone else lines up and waits for the drop.",
+  puck:[100,42.5],
+  p:{
+   C:{at:[96,42.5],mv:[90,42.5,"pass"],t:"Take the faceoff. Knees bent, stick on the ice, eyes on the ref's hand. Try to pull the puck back to your defense."},
+   LW:{at:[95,26.5],mv:[114,20,"skate"],t:"Line up on the edge of the circle on your side. Don't move until the puck drops. Then go hard: help win the puck or skate up your side."},
+   RW:{at:[95,58.5],mv:[114,65,"skate"],t:"Line up on the edge of the circle on your side. Don't move until the puck drops. Then go hard: help win the puck or skate up your side."},
+   LD:{at:[82,33],mv:null,t:"Stand back behind the circle on the left. If your center pulls the puck back to you, you make the first pass."},
+   RD:{at:[82,52],mv:null,t:"Stand back behind the circle on the right. If the puck comes back to your partner, be ready for a pass. If the other team wins it, skate back fast."},
+   G:{at:[14,42.5],mv:null,t:"Stay ready in your crease, even though the puck is far away. Watch the faceoff so you know where the puck goes."}
+  },
+  opp:[[104,42.5],[105,26.5],[105,58.5],[118,33],[118,52],[186,42.5]]},
+
+ {id:"breakout",name:"Breakout",
+  desc:"Your team just got the puck in your own end. Now move it up the ice and out of the zone, fast and together.",
+  puck:[8.5,57],
+  p:{
+   RD:{at:[8,53],mv:[52,79,"pass"],t:"You got the puck behind the net. Look up, then pass to your winger on the boards. If she's covered, pass to the center in the middle."},
+   RW:{at:[52,79],mv:[96,79,"skate"],t:"Get to the boards near the hash marks, with your stick on the ice and your body facing the middle. Catch the pass and skate it out of the zone."},
+   C:{at:[30,54],mv:[62,44,"skate"],t:"Swing low through the middle so your D has a second passing choice. Then skate up the middle with speed."},
+   LW:{at:[62,22],mv:[104,20,"skate"],t:"Get wide on the far side and start moving up ice. If the puck comes across to you, you're off on the rush."},
+   LD:{at:[17,31],mv:[24,38,"skate"],t:"Watch the other side and the front of your net. If your partner gets stuck, be her backup pass, and never leave the front of the net empty."},
+   G:{at:[12,46],mv:null,t:"Talk! Shout 'Time!' if your D has space, or 'Man on!' if someone is chasing her. You see the play better than anyone."}
+  },
+  opp:[[26,70],[42,30],[70,52],[100,30],[105,60],[186,42.5]]},
+
+ {id:"attack",name:"Attack",
+  desc:"You're in the other team's end with the puck. Keep it in the zone, move it around, and get shots on net.",
+  puck:[181,73.5],
+  p:{
+   RW:{at:[178,72],mv:[156,40,"pass"],t:"You have the puck in the corner. Keep your body between the puck and the defender. Look for a pass to the slot."},
+   C:{at:[178,50],mv:[183,46,"skate"],t:"Go to the front of the net. Block the goalie's view, look for rebounds and tip-ins, and be ready to help in the corner."},
+   LW:{at:[156,40],mv:[187,40,"shot"],t:"Find open ice in the high slot. Stick on the ice, ready to shoot the moment the pass arrives!"},
+   LD:{at:[128,16],mv:null,t:"Hold the blue line on your side. If the puck comes to you, shoot low and hard so your teammates can tip it in."},
+   RD:{at:[128,72],mv:null,t:"Stay at the blue line on the puck side. If the puck comes up the boards, stop it from leaving the zone."},
+   G:{at:[14,42.5],mv:null,t:"Stay sharp at the far end. If the other team steals the puck, they'll come fast."}
+  },
+  opp:[[175,65],[170,45],[160,28],[147,57],[110,40],[186,42.5]]},
+
+ {id:"defend",name:"Defend",
+  desc:"The other team has the puck in your end. Stay between them and your net, block the middle, and win the puck back.",
+  puck:[15,74.5],
+  p:{
+   RD:{at:[22,69],mv:[18,72,"skate"],t:"Go to the player with the puck. Stay between her and your net, and use your stick to lift or knock the puck away. No body checking: win with position and your stick."},
+   LD:{at:[19,47],mv:null,t:"Guard the front of the net. Keep your stick on the ice to block passes into the slot."},
+   C:{at:[33,58],mv:[26,62,"skate"],t:"Help down low. Cover the player in the slot, or help your D win the puck in the corner."},
+   RW:{at:[64,72],mv:null,t:"Cover their defender on your side. Stand in the passing lane so they can't get the puck up to the point."},
+   LW:{at:[56,27],mv:null,t:"Stay high on the far side, between their point player and your net. When your team wins the puck, be ready to go!"},
+   G:{at:[12,48],mv:null,t:"Hug the post on the puck side. Stay square to the puck and watch for a pass out in front."}
+  },
+  opp:[[16,72],[34,47],[71,77],[71,13],[38,31],[186,42.5]]},
+
+ {id:"forecheck",name:"Forecheck",
+  desc:"The other team has the puck behind their own net. Your forwards pressure them to force a bad pass, while your defense holds the blue line.",
+  puck:[192,47],
+  p:{
+   C:{at:[176,53],mv:[188,51,"skate"],t:"You're the first one in. Skate hard at the puck carrier and push her toward one side of the ice. Stick on the ice to block passes."},
+   RW:{at:[162,68],mv:[172,73,"skate"],t:"Wait near the hash marks on your side. If they pass up your boards, jump on it."},
+   LW:{at:[162,17],mv:[172,12,"skate"],t:"Wait near the hash marks on your side. If they pass up your boards, jump on it."},
+   LD:{at:[129,24],mv:null,t:"Hold the blue line. Keep the puck from escaping, but don't get caught too deep. If it gets past you, skate back right away."},
+   RD:{at:[129,61],mv:null,t:"Hold the blue line. Keep the puck from escaping, but don't get caught too deep. If it gets past you, skate back right away."},
+   G:{at:[14,42.5],mv:null,t:"Stay focused. A long pass can turn into a breakaway fast."}
+  },
+  opp:[[193,49.5],[180,76],[180,9],[150,42.5],[110,42.5],[186,42.5]]}
+];
+
+/* ---------- Rink drawing ---------- */
+function rinkBase(){
+  const circ=(cx,cy,cls)=>`<circle cx="${cx}" cy="${cy}" r="15" class="${cls}"/><circle cx="${cx}" cy="${cy}" r="1" class="dot"/>
+    <path d="M${cx-3},${cy-15}v-2.2M${cx+3},${cy-15}v-2.2M${cx-3},${cy+15}v2.2M${cx+3},${cy+15}v2.2" class="fc"/>`;
+  return `
+  <defs>
+    <clipPath id="iceclip"><rect x="0" y="0" width="200" height="85" rx="28"/></clipPath>
+    ${["skate","pass","shot"].map(k=>`<marker id="m-${k}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="${k==='skate'?'#0f1d2e':k==='pass'?'#2b5fb8':'#d6334a'}"/></marker>`).join("")}
+  </defs>
+  <rect x="0" y="0" width="200" height="85" rx="28" class="ice"/>
+  <g clip-path="url(#iceclip)">
+    <line x1="11" y1="0" x2="11" y2="85" class="gl"/><line x1="189" y1="0" x2="189" y2="85" class="gl"/>
+    <line x1="75" y1="0" x2="75" y2="85" class="bl"/><line x1="125" y1="0" x2="125" y2="85" class="bl"/>
+    <line x1="100" y1="0" x2="100" y2="85" class="rl"/>
+  </g>
+  <circle cx="100" cy="42.5" r="15" class="fcb"/><circle cx="100" cy="42.5" r=".9" fill="#2b5fb8"/>
+  ${circ(31,20.5,"fc")}${circ(31,64.5,"fc")}${circ(169,20.5,"fc")}${circ(169,64.5,"fc")}
+  ${[[80,20.5],[80,64.5],[120,20.5],[120,64.5]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1" class="dot"/>`).join("")}
+  <path d="M11,36.5 A6,6 0 0,1 11,48.5Z" class="crease"/>
+  <path d="M189,36.5 A6,6 0 0,0 189,48.5Z" class="crease"/>
+  <rect x="7.2" y="39.5" width="3.8" height="6" rx="1" class="net"/>
+  <rect x="189" y="39.5" width="3.8" height="6" rx="1" class="net"/>`;
+}
+
+/* ---------- Positions view ---------- */
+const svg=document.getElementById("rink");
+let sitIdx=0, selPos="C";
+
+const MQ=window.matchMedia("(max-width: 640px)");
+let VERT=false;
+function buildRink(){
+  VERT=MQ.matches;
+  svg.classList.toggle("vert",VERT);
+  svg.setAttribute("viewBox",VERT?"-4 -9 93 220":"-3 -7 206 95");
+  const hide=!document.getElementById("showArrows").checked?" hide":"";
+  const labels=VERT
+   ?`<text x="42.5" y="-3.5" class="zonelbl" text-anchor="middle">&#8593; Their end (attack)</text>
+     <text x="42.5" y="207.5" class="zonelbl" text-anchor="middle">Your end (defend)</text>`
+   :`<text x="37" y="-2.5" class="zonelbl" text-anchor="middle">Your end (defend)</text>
+     <text x="100" y="-2.5" class="zonelbl" text-anchor="middle">Neutral zone</text>
+     <text x="163" y="-2.5" class="zonelbl" text-anchor="middle">Their end (attack) &#8594;</text>`;
+  svg.innerHTML = `<g ${VERT?'transform="translate(0,200) rotate(-90)"':''}>` + rinkBase() + `
+   <g id="oppL"></g><g id="arrL" class="arrows${hide}"></g>
+   <g class="puck" id="puck"><circle r="${VERT?1.8:1.5}" fill="#111"/></g>
+   <g id="plL"></g></g>` + labels;
+  const plL=svg.querySelector("#plL");
+  ORDER.forEach(k=>{
+    const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("class","pl");g.dataset.pos=k;g.setAttribute("tabindex","0");g.setAttribute("role","button");
+    g.setAttribute("aria-label",POS[k].name);
+    const col=POS[k].g==="F"?"var(--accent)":POS[k].g==="D"?"var(--navy)":"var(--gold)";
+    g.innerHTML=VERT?`<circle class="halo" r="7.8"/><circle class="body" r="6" fill="${col}"/><text transform="rotate(90)">${k}</text>`
+                    :`<circle class="halo" r="6.6"/><circle class="body" r="5" fill="${col}"/><text>${k}</text>`;
+    g.addEventListener("click",()=>{selectPos(k);if(VERT){const p=document.getElementById("panel");if(p.getBoundingClientRect().top>innerHeight-80)p.scrollIntoView({behavior:"smooth",block:"start"});}});
+    g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selectPos(k);}});
+    plL.appendChild(g);
+  });
+}
+
+function arrowPath(x1,y1,x2,y2,type){
+  // shorten start/end so it doesn't sit under the circle
+  const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L;
+  const off=VERT?6.8:5.8,sx=x1+ux*off,sy=y1+uy*off,ex=x2-ux*(type==="shot"?1:2),ey=y2-uy*(type==="shot"?1:2);
+  // gentle curve for skating
+  if(type==="skate"&&L>12){const mx=(sx+ex)/2-uy*4,my=(sy+ey)/2+ux*4;return `M${sx},${sy}Q${mx},${my} ${ex},${ey}`;}
+  return `M${sx},${sy}L${ex},${ey}`;
+}
+
+function renderSit(){
+  const s=SITS[sitIdx];
+  document.getElementById("sitName").textContent=s.name;
+  document.getElementById("sitDesc").textContent=s.desc;
+  document.querySelectorAll("#sits .chipbtn").forEach((b,i)=>b.setAttribute("aria-pressed",i===sitIdx));
+  svg.querySelectorAll(".pl").forEach(g=>{const [x,y]=s.p[g.dataset.pos].at;g.style.transform=`translate(${x}px,${y}px)`;});
+  svg.querySelector("#puck").style.transform=`translate(${s.puck[0]}px,${s.puck[1]}px)`;
+  svg.querySelector("#oppL").innerHTML=s.opp.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${VERT?5:4.4}" class="opp"/><text x="${x}" y="${y}" class="opptxt"${VERT?` transform="rotate(90 ${x} ${y})"`:""}>${i===5?"G":"X"}</text>`).join("");
+  svg.querySelector("#arrL").innerHTML=ORDER.filter(k=>s.p[k].mv).map(k=>{
+    const [x,y]=s.p[k].at,[x2,y2,t]=s.p[k].mv;
+    return `<path data-pos="${k}" class="arrow ${t}" d="${arrowPath(x,y,x2,y2,t)}" marker-end="url(#m-${t})"/>`;}).join("");
+  renderPanel();
+}
+
+function selectPos(k){selPos=k;renderPanel();}
+
+function renderPanel(){
+  const s=SITS[sitIdx],P=POS[selPos],info=s.p[selPos];
+  svg.querySelectorAll(".pl").forEach(g=>{g.classList.toggle("sel",g.dataset.pos===selPos);g.classList.toggle("dim",g.dataset.pos!==selPos);});
+  svg.querySelectorAll(".arrow").forEach(a=>a.classList.toggle("dim",a.dataset.pos!==selPos));
+  document.querySelectorAll("#posrow .posbtn").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pos===selPos));
+  const grp=P.g==="F"?"Forward":P.g==="D"?"Defense":"Goalie";
+  const col=P.g==="F"?"var(--accent)":P.g==="D"?"var(--navy)":"var(--gold)";
+  document.getElementById("panel").innerHTML=`
+    <span class="tag" style="background:${col}">${grp}</span>
+    <h3>${P.name}</h3>
+    <p class="where">${P.side}</p>
+    <h4>Your job in this play: ${s.name}</h4>
+    <p class="now">${info.t}</p>
+    <h4>What a ${P.name.toLowerCase()} does</h4>
+    <p>${P.role}</p>
+    <h4>Skills to work on</h4>
+    <ul>${P.skills.map(x=>`<li>${x}</li>`).join("")}</ul>
+    <div class="remember">Remember: ${P.remember}</div>`;
+}
+
+function initPositions(){
+  buildRink();
+  const sits=document.getElementById("sits");
+  SITS.forEach((s,i)=>{const b=document.createElement("button");b.className="chipbtn";b.textContent=s.name;b.addEventListener("click",()=>{sitIdx=i;renderSit();});sits.appendChild(b);});
+  const pr=document.getElementById("posrow");
+  ORDER.forEach(k=>{const b=document.createElement("button");b.className="posbtn "+POS[k].g;b.dataset.pos=k;b.textContent=k;b.setAttribute("aria-label",POS[k].name);b.addEventListener("click",()=>selectPos(k));pr.appendChild(b);});
+  document.getElementById("prevSit").onclick=()=>{sitIdx=(sitIdx+SITS.length-1)%SITS.length;renderSit();};
+  document.getElementById("nextSit").onclick=()=>{sitIdx=(sitIdx+1)%SITS.length;renderSit();};
+  document.getElementById("showArrows").onchange=e=>svg.querySelector("#arrL").classList.toggle("hide",!e.target.checked);
+  document.getElementById("posgrid").innerHTML=ORDER.map(k=>{const P=POS[k];const col=P.g==="F"?"var(--accent)":P.g==="D"?"var(--navy)":"var(--gold)";
+    return `<div class="card poscard" style="border-top-color:${col}"><h3>${P.name} <span style="color:${col}">${k}</span></h3><p>${P.role}</p><div class="skills">${P.skills.map(x=>`<span>${x}</span>`).join("")}</div></div>`;}).join("");
+  MQ.addEventListener("change",()=>{buildRink();renderSit();});
+  renderSit();
+}
+
+/* ---------- Drills ---------- */
+const HALF="98 -2 104 89", FULL="-2 -2 204 89";
+const DRILLS=[
+ {id:"sharks",name:"Sharks & Minnows",cat:"Skating",lv:"b",min:10,players:"Whole team",
+  view:FULL,
+  draw:{pl:[[14,15,""],[14,30,""],[14,45,""],[14,60,""],[14,72,""],[100,42.5,"S"]],
+        ln:[["skate","M19,15 Q100,8 182,18"],["skate","M19,45 Q100,55 182,45"],["skate","M19,72 Q100,80 182,68"],["skate","M100,47 Q96,58 92,64"]]},
+  steps:["Everyone (the minnows) lines up on one goal line. One player (the shark) stands at center ice.","When the coach yells \"Go!\", the minnows skate to the far goal line without getting tagged.","Anyone tagged becomes a shark too. Keep going until there's one minnow left."],
+  tips:"Keep your head up so you can see the sharks. Use quick feet and stop on both sides to dodge."},
+ {id:"stops",name:"Stop & Go Lines",cat:"Skating",lv:"b",min:8,players:"Whole team, in waves",
+  view:FULL,
+  draw:{pl:[[11,42.5,""]],ln:[["skate","M16,38 L73,38"],["skate","M73,42.5 L18,42.5"],["skate","M16,47 L98,47"],["skate","M98,51 L18,51"]]},
+  steps:["Start on the goal line. Skate hard to the near blue line and do a hockey stop.","Skate back to the goal line and stop.","Then go to the red line and back, the far blue line and back, and the far goal line and back."],
+  tips:"Get low and push your skates out sideways to stop. Practice stopping facing BOTH ways, not just your favorite side."},
+ {id:"circles",name:"Circle Edges & Crossovers",cat:"Skating",lv:"b",min:8,players:"Lines at each circle",
+  view:HALF,
+  draw:{pl:[[169,5.5,""],[169,49.5,""]],ln:[["skate","M171,5.6 A15,15 0 1,1 166,5.9"],["skate","M167,49.6 A15,15 0 1,0 172,49.9"]]},
+  steps:["Skate around the faceoff circle forward, crossing one foot over the other (crossovers).","After two laps, go the other direction.","Next: glide on one foot around the circle, on the inside edge, then the outside edge."],
+  tips:"Knees bent like you're sitting in a chair. Push with the outside leg. Look where you want to go."},
+ {id:"backward",name:"Backward Skating & Pivots",cat:"Skating",lv:"i",min:10,players:"Great for defense",
+  view:FULL,
+  draw:{pl:[[11,42.5,""]],ln:[["skate","M16,42.5 L72,42.5"],["back","M76,42.5 L122,42.5"],["skate","M126,42.5 L183,42.5"]]},
+  steps:["Skate forward from the goal line to the blue line.","At the blue line, pivot (turn) to skate backward to the far blue line.","Pivot again and skate forward to the far goal line."],
+  tips:"Backward C-cuts: push out and pull back in, like drawing the letter C with each skate. Keep your chest up and stick in front."},
+ {id:"weave",name:"Cone Weave Stickhandling",cat:"Puck Handling",lv:"b",min:8,players:"One line, one puck each",
+  view:HALF,
+  draw:{cones:[[120,42.5],[133,42.5],[146,42.5],[159,42.5],[172,42.5]],pl:[[106,42.5,""]],
+        ln:[["skate","M111,42.5 C116,32 124,32 127,42.5 S138,53 140,42.5 S151,32 153,42.5 S164,53 166,42.5 S177,32 182,40"]]},
+  steps:["Set 5 cones in a line. Weave in and out of them while keeping the puck on your stick.","Go slowly first, then faster.","Next round: try to only use your backhand, then only your forehand."],
+  tips:"Soft hands: hold your stick gently. Keep the puck out in front of you and look up between the cones."},
+ {id:"partner",name:"Partner Passing",cat:"Passing",lv:"b",min:8,players:"Pairs",
+  view:HALF,
+  draw:{pl:[[140,22,"A"],[140,63,"B"]],ln:[["pass","M138,27.5 L138,57"],["pass","M142,57.5 L142,28"]]},
+  steps:["Stand across from your partner, about 4 stick-lengths apart.","Pass back and forth 10 times on the forehand, then 10 on the backhand.","Next: skate side by side down the ice and keep passing."],
+  tips:"Aim at your partner's stick blade. Follow through toward her. When you catch, let your stick 'give' a little so the puck doesn't bounce off."},
+ {id:"giveandgo",name:"Give-and-Go",cat:"Passing",lv:"i",min:10,players:"Pairs + goalie",
+  view:HALF,
+  draw:{pl:[[110,58,"A"],[146,76,"B"],[186,42.5,"G"]],
+        ln:[["pass","M115,60 L141,73"],["skate","M114,54 Q140,44 166,49"],["pass","M150,72 L163,53"],["shot","M168,48.5 L186,44"]]},
+  steps:["Player A passes to B on the boards.","A keeps skating hard toward the net (this is the 'go').","B passes it right back to A, who shoots on net."],
+  tips:"Don't stop after you pass. The best time to get open is right after you give the puck away."},
+ {id:"slot",name:"Slot Shooting",cat:"Shooting",lv:"b",min:10,players:"One line + goalie",
+  view:HALF,
+  draw:{pl:[[150,42.5,""],[140,42.5,""],[130,42.5,""],[186,42.5,"G"]],ln:[["shot","M155.5,42.5 L184,42.5"]]},
+  steps:["Line up in the slot, the area right in front of the net.","Take a wrist shot, then go to the back of the line.","Each round, pick a target: low glove side, low blocker side, then high."],
+  tips:"Puck starts behind you near your back foot. Move your weight from back foot to front foot and roll your wrists. Point your stick at your target when you finish."},
+ {id:"tips",name:"Net-Front Tips & Rebounds",cat:"Shooting",lv:"i",min:10,players:"D at point, F at net, goalie",
+  view:HALF,
+  draw:{pl:[[128,20,"D"],[178,49,"F"],[186,42.5,"G"]],ln:[["shot","M133,22 L173,46"],["shot","M182,47 L187,43"]]},
+  steps:["A defender at the blue line takes a low shot toward the net.","A forward stands at the net front, stick on the ice, and tips the puck or hits the rebound.","Switch roles every 5 shots."],
+  tips:"Defenders: low and on net beats hard and wide. Forwards: stick on the ice, eyes on the puck, stay strong in front."},
+ {id:"breakout",name:"D-to-Wing Breakout",cat:"Team Play",lv:"i",min:12,players:"D, wingers, centers",
+  view:FULL,
+  draw:{pl:[[8,53,"D"],[52,79,"W"],[30,54,"C"]],ln:[["pass","M12,57 L47,77"],["skate","M57,79 L120,79"],["skate","M35,52 Q60,40 120,44"],["pass","M120,77 L122,49"]]},
+  steps:["Coach dumps the puck behind the net. The D picks it up.","The winger gets to the boards at the hash marks. The D passes to her.","The winger skates it out while the center swings through the middle for a pass."],
+  tips:"Winger: stick on the ice, show a target, face the middle. D: look up before you pass. Center: keep moving, don't stand still."},
+ {id:"twoone",name:"2-on-1 Rush",cat:"Team Play",lv:"i",min:12,players:"2 forwards, 1 D, goalie",
+  view:HALF,
+  draw:{pl:[[105,30,"F"],[105,58,"F"],[135,42.5,"D"],[186,42.5,"G"]],
+        ln:[["skate","M110,30 Q150,28 172,36"],["skate","M110,58 Q150,64 168,58"],["back","M140,42.5 L165,45"],["pass","M172,40 L169,54"]]},
+  steps:["Two forwards start at the red line with one puck. One defender starts at the blue line.","The forwards attack the net together. The defender skates backward to defend.","Forwards try to score. The defender tries to stop the pass."],
+  tips:"Puck carrier: drive to the net. Partner: stay wide with your stick on the ice. Defender: take away the pass; let the goalie take the shooter."},
+ {id:"angling",name:"Angling (No-Check Defense)",cat:"Team Play",lv:"i",min:10,players:"Pairs",
+  view:HALF,
+  draw:{pl:[[110,70,"X"],[118,40,"D"]],ln:[["skate","M115,72 L176,76"],["skate","M122,44 Q148,58 170,70"]]},
+  steps:["One player skates up the boards with the puck.","The defender skates at an angle to cut her off and push her toward the boards.","Once she's trapped against the boards, the defender uses her stick to take the puck."],
+  tips:"You don't need to body check to win the puck. Take away the middle, keep your stick on the ice, and stay between her and the net."},
+ {id:"goalie",name:"Goalie Shuffle & T-Push",cat:"Goalie",lv:"b",min:8,players:"Goalies",
+  view:"160 18 44 49",
+  draw:{pl:[[183,42.5,"G"]],ln:[["skate","M183,37 L184,30"],["skate","M184,48 L183,55"],["skate","M178,42.5 L172,42.5"]],cones:[[189,39.2],[189,45.8]]},
+  steps:["Start in your ready stance at the middle of the crease.","Shuffle (small side steps) to one post, then back to the middle, then the other post.","T-push: turn your skate toward the top of the crease and push out. Then come back."],
+  tips:"Stay square to where the puck would be. Hands out in front, eyes up, and stay balanced so you're always ready."},
+
+ /* ---- More skating ---- */
+ {id:"redlight",name:"Red Light, Green Light",cat:"Skating",lv:"b",min:8,players:"Whole team",
+  view:FULL,
+  draw:{pl:[[14,20,""],[14,42.5,""],[14,65,""],[176,42.5,"X"]],ln:[["skate","M19,20 L112,20"],["skate","M19,42.5 L96,42.5"],["skate","M19,65 L120,65"]]},
+  steps:["Everyone lines up on the goal line. The coach stands at the far end with her back to the team.","\"Green light!\" means skate. \"Red light!\" means stop right away. The coach turns around to check.","Anyone still moving goes back to the start. First to reach the coach wins."],
+  tips:"This is secretly a stopping drill. Stop low and hard, on both sides, without falling."},
+ {id:"tightturns",name:"Tight Turns Around Cones",cat:"Skating",lv:"b",min:8,players:"One line",
+  view:HALF,
+  draw:{cones:[[130,20],[155,64],[180,20]],pl:[[108,42.5,""]],
+        ln:[["skate","M113,40 Q124,30 127,17 Q131,10 135,18 Q141,48 151,64 Q156,72 160,63 Q167,38 177,18 Q181,11 185,19"]]},
+  steps:["Skate to the first cone and turn tightly around it.","Skate to the next cone and turn the other way.","When it gets easy, carry a puck through the whole course."],
+  tips:"Lean into the turn, inside knee bent deep, and keep your stick on the ice. Turn your head and shoulders first; your skates will follow."},
+ {id:"figure8",name:"Figure 8s",cat:"Skating",lv:"i",min:8,players:"Lines in each end",
+  view:HALF,
+  draw:{pl:[[150,42.5,""]],
+        ln:[["skate","M155,42 C172,40 188,30 184,15 C178,0 154,2 154,20 C154,32 162,40 169,42.5 C180,46 188,58 184,70 C178,84 154,82 154,64 C154,54 160,47 166,44"]]},
+  steps:["Skate a figure 8 around the two faceoff circles in one end, crossing in the middle.","Do two forward, then two backward.","Advanced: switch from forward to backward each time you cross the middle."],
+  tips:"Crossovers on every turn. When you switch to backward, open your hips and turn on your toes so you don't lose speed."},
+
+ /* ---- More puck handling ---- */
+ {id:"mirror",name:"Heads-Up Mirror",cat:"Puck Handling",lv:"b",min:6,players:"Pairs",
+  view:HALF,
+  draw:{pl:[[140,30,"A"],[140,55,"B"]],ln:[["skate","M135,30 L122,30"],["skate","M135,55 L122,55"],["skate","M145,30 L158,30"],["skate","M145,55 L158,55"]]},
+  steps:["Partners face each other, each with a puck.","The leader stickhandles and moves left, right, forward, or backward.","The partner copies her moves without looking down at her own puck. Switch leaders after 30 seconds."],
+  tips:"You can't copy her if you're looking at your puck. Feel the puck on your blade and keep your eyes on your partner."},
+ {id:"toedrag",name:"Toe Drag Cones",cat:"Puck Handling",lv:"i",min:10,players:"One line, one puck each",
+  view:HALF,
+  draw:{cones:[[125,42.5],[147,42.5],[169,42.5]],pl:[[106,42.5,""]],
+        ln:[["skate","M111,42.5 L118,42.5 Q125,32 132,42.5 L140,42.5 Q147,53 154,42.5 L162,42.5 Q169,32 176,42.5 L184,42.5"]]},
+  steps:["Skate toward each cone with the puck in front of you.","Just before the cone, cup the puck with the toe of your blade and pull it to the side, around the cone.","Push it back out in front and attack the next cone."],
+  tips:"Move the puck, not your whole body. Turn your blade over the top of the puck so it doesn't slip away."},
+ {id:"protect",name:"Puck Protection Battle",cat:"Puck Handling",lv:"i",min:8,players:"Pairs",
+  view:HALF,
+  draw:{pl:[[166,22,"F"],[175,27,"X"]],ln:[["skate","M159,16 A13,13 0 0,1 178,9"]]},
+  steps:["Two players and one puck inside a faceoff circle.","The puck carrier tries to keep the puck for 20 seconds while staying inside the circle.","Her partner tries to steal it with her stick only. Switch roles."],
+  tips:"Keep your body between the defender and the puck. Wide stance, knees bent, and keep the puck on your far side."},
+
+ /* ---- More passing ---- */
+ {id:"triangle",name:"Triangle Passing",cat:"Passing",lv:"b",min:8,players:"Groups of 3",
+  view:HALF,
+  draw:{pl:[[130,24,"A"],[130,61,"B"],[166,42.5,"C"]],
+        ln:[["pass","M134,26.5 L161,40"],["pass","M161,45 L134,58.5"],["pass","M130,56 L130,29.5"]]},
+  steps:["Three players make a triangle about 5 stick-lengths apart.","Pass around the triangle: A to C, C to B, B to A.","Switch directions every 10 passes. Then try one-touch passes (pass it on without stopping it)."],
+  tips:"Turn your body toward your target before you pass. Call your teammate's name so she knows it's coming."},
+ {id:"saucer",name:"Saucer Pass",cat:"Passing",lv:"i",min:10,players:"Pairs",
+  view:HALF,
+  draw:{cones:[[133,42.5],[139,42.5]],pl:[[136,22,"A"],[136,63,"B"]],ln:[["pass","M134,28 Q124,42.5 134,57"]]},
+  steps:["Lay a spare stick (or two cones) on the ice between you and your partner.","Pass the puck so it lifts just over the stick and lands flat.","Once you can do it standing still, try it while skating."],
+  tips:"Start the puck at the heel of your blade and roll it to the toe. Flick your wrists up a little so the puck spins flat like a flying saucer."},
+ {id:"stretch",name:"Stretch Pass",cat:"Passing",lv:"i",min:10,players:"D, forwards, goalie",
+  view:FULL,
+  draw:{pl:[[22,30,"D"],[108,72,"F"],[186,42.5,"G"]],
+        ln:[["pass","M26,32.5 L103,69.5"],["skate","M113,72 Q150,72 170,58"],["shot","M172,55 L186,45.5"]]},
+  steps:["The forward starts at her own blue line and skates up the boards.","The defender, near her own net, makes a long pass to the forward before she reaches the far blue line.","The forward catches the pass at full speed, goes in, and shoots."],
+  tips:"Defender: pass to where she's going, not where she is. Forward: stick on the ice for a target, and don't cross their blue line before the puck."},
+
+ /* ---- More shooting ---- */
+ {id:"backhand",name:"Backhand Shots",cat:"Shooting",lv:"b",min:10,players:"One line + goalie",
+  view:HALF,
+  draw:{pl:[[163,60,""],[152,65,""],[141,70,""],[186,42.5,"G"]],ln:[["shot","M167,57 L185,45"]]},
+  steps:["Line up on your backhand side of the net, near the hash marks.","Skate in a few strides and take a backhand shot.","First aim low, then try to lift it over the goalie's pads."],
+  tips:"Puck starts near the heel on your backhand side. Pull with your top hand, push with your bottom hand, and follow through high toward the net."},
+ {id:"catchshoot",name:"Catch & Shoot",cat:"Shooting",lv:"i",min:10,players:"Passer, shooters, goalie",
+  view:HALF,
+  draw:{pl:[[178,74,"X"],[152,32,""],[140,28,""],[186,42.5,"G"]],ln:[["pass","M174,71 L156,35"],["shot","M157,33 L185,41"]]},
+  steps:["A coach or teammate stands in the corner with pucks.","The shooter skates into the high slot and calls for the puck.","Catch the pass and shoot right away, without extra stickhandles."],
+  tips:"Be ready before the puck gets there: stick down, knees bent, eyes on the net. The faster you shoot, the less time the goalie has to move."},
+ {id:"breakaway",name:"Breakaway Race",cat:"Shooting",lv:"i",min:10,players:"Pairs + goalie",
+  view:HALF,
+  draw:{pl:[[106,28,""],[106,57,"X"],[186,42.5,"G"]],ln:[["skate","M111,28 Q140,36 170,41"],["skate","M111,57 Q140,52 164,47"],["shot","M172,42 L186,42.5"]]},
+  steps:["Two players start side by side on the red line.","The coach shoots a puck into the zone. Both race to get it.","Whoever gets it goes in alone on the goalie. The other player chases her and tries to catch up (that's backchecking)."],
+  tips:"Push the puck ahead and skate hard. Near the net, slow your hands down and pick a move: shoot, or fake one way and go the other."},
+
+ /* ---- More team play ---- */
+ {id:"smallarea",name:"3-on-3 Small-Area Game",cat:"Team Play",lv:"b",min:15,players:"Two teams of 3",
+  view:HALF,
+  draw:{pl:[[140,24,""],[148,62,""],[170,38,""],[134,46,"X"],[160,24,"X"],[174,64,"X"]],ln:[["pass","M144,27 L166,36"],["skate","M152,59 Q165,54 172,48"]]},
+  steps:["Play 3-on-3 inside one zone, with one net (or two nets cross-ice).","Shifts are short: 45 seconds, then change.","Play to 3 goals, then switch teams around."],
+  tips:"Never stand still. When your team has the puck, skate to open ice. When they don't, find a player to cover. Talk the whole time!"},
+ {id:"cycle",name:"The Cycle",cat:"Team Play",lv:"i",min:10,players:"Groups of 3 forwards",
+  view:HALF,
+  draw:{pl:[[181,70,"F"],[160,78,"F"],[170,50,"F"],[186,42.5,"G"]],
+        ln:[["skate","M177,73 Q170,78 165,78"],["pass","M163,74 Q172,68 177,66"],["skate","M157,74 Q150,62 155,50"],["shot","M174,48 L185,44"]]},
+  steps:["One forward has the puck in the corner. She skates up the boards and leaves the puck behind for the next forward coming low.","That forward takes it back into the corner, and the first one moves to open ice in the slot.","The third forward goes to the net. Keep rotating, then pass to the slot or net for a shot."],
+  tips:"Keep the puck along the boards, away from defenders. After you pass, move. Go to the net or find open space."},
+ {id:"walkdzone",name:"Walk the D-Zone",cat:"Team Play",lv:"b",min:10,players:"Full unit of 5 + goalie",
+  view:"-2 -2 104 89",
+  draw:{pl:[[22,69,"D"],[19,47,"D"],[33,58,"C"],[64,72,"W"],[56,27,"W"],[12,48,"G"],[13,77,"X"]],
+        ln:[["skate","M10,78 Q2,42 16,10"],["skate","M30,62 Q34,40 30,30"]]},
+  steps:["Players set up in their defensive zone positions (see Defend on the Positions page).","The coach slowly moves the puck around the zone. Everyone shifts to stay in the right spot.","The coach yells \"Freeze!\" and checks that every player is in the right place."],
+  tips:"Watch the puck and your player at the same time. Know who's closest to the puck, and never leave the front of the net empty."},
+
+ /* ---- More goalie ---- */
+ {id:"butterfly",name:"Butterfly Drops & Recovery",cat:"Goalie",lv:"b",min:8,players:"Goalies",
+  view:"160 18 44 49",
+  draw:{pl:[[181,42.5,"G"]],ln:[["skate","M181,47 L181,53"],["skate","M177,42.5 L174,32"],["skate","M177,42.5 L174,53"]]},
+  steps:["From your ready stance, drop into the butterfly: knees to the ice, pads flat, hands out in front.","Get back up fast by pushing up with one leg. Do 10.","Next: drop, then recover by pushing toward one post, and then the other."],
+  tips:"Keep your chest up and gloves out in front when you drop. Get up with the leg toward where you want to go, so you're already moving."},
+ {id:"wrap",name:"Post-to-Post Wraparounds",cat:"Goalie",lv:"i",min:8,players:"Goalie + 1 skater",
+  view:"160 18 44 49",
+  draw:{pl:[[184,46,"G"],[194,58,"X"]],ln:[["skate","M197,54 Q200,42.5 195,33 L188,30"],["skate","M184,41 L184,37"]]},
+  steps:["A skater starts behind the net with the puck.","She skates around the back of the net and tries to stuff it in on the other side.","The goalie follows the puck behind her and pushes across to seal the far post before the skater gets there."],
+  tips:"Look over your shoulder to track the puck behind you. Push hard and get your pad tight against the post, with no gap."},
+ /* ---- ADVANCED ---- */
+ {id:"transitions",name:"Lap Transitions",cat:"Skating",lv:"a",min:10,players:"Whole team, in waves",
+  view:FULL,
+  draw:{pl:[[16,8,""]],ln:[["skate","M21,8 L72,8"],["back","M78,8 L122,8"],["skate","M128,8 L172,8 Q194,12 194,40"],["back","M188,77 L128,77"],["skate","M122,77 L78,77"]]},
+  steps:["Skate laps around the rink along the boards.","At every blue line, switch: forward to backward, or backward to forward, without slowing down.","Round 2: do it with a puck. Round 3: the coach's whistle means switch, wherever you are."],
+  tips:"Open your hips and turn on the balls of your feet. Keep your feet moving through the turn. Speed should never drop."},
+ {id:"zigzag",name:"Zig-Zag Stop & Pivot",cat:"Skating",lv:"a",min:8,players:"One line",
+  view:HALF,
+  draw:{cones:[[118,22],[131,62],[146,22],[161,62],[178,42.5]],pl:[[106,42.5,""]],
+        ln:[["skate","M109,38 L116,26"],["back","M120,27 L129,57"],["skate","M133,57 L144,27"],["back","M148,27 L159,57"],["skate","M163,58 L175,46"]]},
+  steps:["Sprint forward to the first cone and stop.","Pivot and skate backward to the next cone.","Pivot forward again to the next. Keep alternating to the end, then sprint to the net."],
+  tips:"Every stop and pivot should be quick and low. Keep your stick on the ice and your eyes up the whole way."},
+ {id:"traffic",name:"Traffic Dangles",cat:"Puck Handling",lv:"a",min:10,players:"Line + 3 'defenders'",
+  view:HALF,
+  draw:{pl:[[108,42.5,""],[130,42.5,"X"],[150,28,"X"],[168,54,"X"]],
+        ln:[["skate","M113,42.5 Q122,31 132,34 Q143,37 143,28 Q148,18 158,26 Q164,38 162,48 Q160,62 170,62 Q178,60 182,50"]]},
+  steps:["Three players stand in a zig-zag with their sticks on the ice as defenders.","The puck carrier works through them using toe drags, pull-backs, and quick changes of direction.","Round 2: the defenders can try to poke-check the puck away (but can't move their feet)."],
+  tips:"Change speed and direction at the same time. Keep the puck on your far hip, away from the defender's stick."},
+ {id:"insideout",name:"Inside-Out 1-on-1",cat:"Puck Handling",lv:"a",min:10,players:"F vs D + goalie",
+  view:HALF,
+  draw:{pl:[[112,58,"F"],[140,48,"D"],[186,42.5,"G"]],
+        ln:[["skate","M117,59 Q138,66 150,56 Q158,47 172,46"],["back","M144,47 L160,47"],["shot","M174,45.5 L186,43.5"]]},
+  steps:["The forward starts at the red line with a puck. The defender starts at the blue line.","The forward attacks wide, shows the puck to the outside, then pulls it inside past the defender's stick and cuts to the net.","The defender skates backward and tries to keep a tight gap and take the puck."],
+  tips:"Forward: sell the outside move with your head and shoulders first. Defender: stick on the puck, match her speed, and don't lunge."},
+ {id:"reverse",name:"Breakout Under Pressure",cat:"Passing",lv:"a",min:12,players:"2 D, winger, forechecker",
+  view:FULL,
+  draw:{pl:[[8,58,"D"],[16,27,"D"],[52,10,"W"],[30,68,"X"]],
+        ln:[["skate","M30,63 L15,60"],["pass","M8,53 Q3,42 12,31"],["pass","M21,25 L47,12"],["skate","M57,9 L112,9"]]},
+  steps:["The coach dumps the puck into the corner. One D goes to get it, with a forechecker chasing her.","Under pressure, she reverses the puck behind the net to her D partner on the other side.","The partner passes up the boards to the winger, who skates it out of the zone."],
+  tips:"Shoulder-check before you get to the puck so you already know where the pressure is. Your partner should call 'Reverse!' when she's open."},
+ {id:"threeweave",name:"Three-Player Weave",cat:"Passing",lv:"a",min:12,players:"Groups of 3 + goalie",
+  view:FULL,
+  draw:{pl:[[12,20,""],[12,42.5,""],[12,65,""],[186,42.5,"G"]],
+        ln:[["skate","M17,20 Q60,22 85,60 Q110,74 150,58"],["skate","M17,42.5 Q45,44 62,22 Q80,10 118,30 Q138,40 165,44"],["skate","M17,65 Q55,66 100,46 Q128,18 168,26"],["pass","M38,43 L58,26"],["shot","M168,44 L185,43"]]},
+  steps:["Three players start on the goal line. The middle player has the puck.","She passes to one side, then skates behind the player she passed to.","That player passes to the far side and skates behind her. Keep weaving down the ice and finish with a shot."],
+  tips:"Pass to the space in front of your teammate. Always skate behind the player you passed to. Stay in motion and stay onside."},
+ {id:"onetimer",name:"One-Timers",cat:"Shooting",lv:"a",min:10,players:"Passer, shooters, goalie",
+  view:HALF,
+  draw:{pl:[[155,77,"X"],[166,18,""],[186,42.5,"G"]],ln:[["pass","M157,72 L165,24"],["shot","M169,22 L186,40"]]},
+  steps:["The shooter sets up in the far faceoff circle with her stick back, ready.","The passer on the half-wall (the side boards) passes across.","The shooter hits the puck as it arrives, without stopping it first."],
+  tips:"Open your body toward the passer and keep your weight on your back foot. Keep your eyes on the puck until you hit it. Practice the timing slowly first."},
+ {id:"walkline",name:"Walk the Line & Shoot",cat:"Shooting",lv:"a",min:10,players:"D, net-front F, goalie",
+  view:HALF,
+  draw:{pl:[[128,66,"D"],[179,47,"F"],[186,42.5,"G"]],ln:[["skate","M128,61 L128,40"],["shot","M131,37 L183,43"]]},
+  steps:["The defender gets a pass at the point.","She walks along the blue line toward the middle to get a better angle and a clear lane.","She shoots low and hard through the forward screening in front. The forward tries to tip it."],
+  tips:"Use small crossovers to move along the line while keeping your head up. Low and on net is the goal: that's how you get tips and rebounds."},
+ {id:"curl",name:"Curl & Shoot in Stride",cat:"Shooting",lv:"a",min:10,players:"One line + goalie",
+  view:HALF,
+  draw:{pl:[[128,72,""],[186,42.5,"G"]],ln:[["skate","M133,73 Q154,82 160,66 Q162,54 160,46"],["shot","M163,45 L185,43"]]},
+  steps:["Skate up the boards with the puck.","Curl tight around the top of the faceoff circle toward the middle.","Shoot while you're still moving, without gliding or stopping first."],
+  tips:"Pull the puck across your body as you shoot. That changes the angle and fools the goalie. Keep your feet moving."},
+ {id:"threetwo",name:"3-on-2 Rush",cat:"Team Play",lv:"a",min:12,players:"3 F, 2 D, goalie",
+  view:HALF,
+  draw:{pl:[[104,18,"F"],[104,42.5,"F"],[104,67,"F"],[134,31,"D"],[134,54,"D"],[186,42.5,"G"]],
+        ln:[["skate","M109,18 L156,18"],["skate","M109,42.5 Q140,39 176,45"],["skate","M109,67 Q138,68 154,70"],["back","M138,31 L158,34"],["back","M138,54 L158,52"],["pass","M155,66 L150,47"],["shot","M152,45 L185,43"]]},
+  steps:["Three forwards start at the red line and attack two defenders.","One forward carries wide, one drives hard to the net, and one trails as the late option.","The defenders work together to stay in the middle and stop the pass."],
+  tips:"Forwards: spread out and drive the net to push the D back. Defenders: talk, stay between the dots, and make them shoot from the outside."},
+ {id:"umbrella",name:"Power Play Setup",cat:"Team Play",lv:"a",min:15,players:"5 attackers vs 4",
+  view:HALF,
+  draw:{pl:[[132,42.5,""],[154,13,""],[154,72,""],[163,42.5,""],[181,48,""],[149,30,"X"],[149,56,"X"],[171,32,"X"],[171,55,"X"],[186,42.5,"G"]],
+        ln:[["pass","M136,40 L151,17"],["pass","M156,18 L161,38"],["shot","M168,42.5 L185,43"]]},
+  steps:["Five players set up: one at the top, two on the half-walls, one in the middle of the slot, and one at the net.","Four penalty killers defend. Move the puck quickly around the outside.","Look for a shot from the middle, or a one-timer from the half-wall. The net-front player screens and gets rebounds."],
+  tips:"Move the puck faster than they can skate. Everyone stays ready to shoot. One extra quick pass usually opens up a great chance."},
+ {id:"pkbox",name:"Penalty Kill Box",cat:"Team Play",lv:"a",min:12,players:"4 defenders + coach",
+  view:HALF,
+  draw:{pl:[[150,31,"F"],[150,55,"F"],[172,34,"D"],[172,52,"D"],[155,78,"X"],[186,42.5,"G"]],
+        ln:[["skate","M152,35 L155,45"],["skate","M152,60 L156,68"],["skate","M174,38 L176,44"],["skate","M174,57 L177,63"]]},
+  steps:["Four players form a box inside the faceoff dots in front of the net.","The coach moves the puck around the outside. The whole box shifts together toward the puck.","When the puck carrier bobbles it, the closest player attacks. Win it and clear it down the ice."],
+  tips:"Stay inside the dots and keep your sticks in the passing lanes. When you're short a player, icing is allowed, so clear it hard."},
+ {id:"regroup",name:"Neutral Zone Regroup",cat:"Team Play",lv:"a",min:12,players:"2 D, 3 F",
+  view:FULL,
+  draw:{pl:[[84,28,"D"],[84,57,"D"],[110,15,"F"],[110,42.5,"F"],[110,70,"F"],[186,42.5,"G"]],
+        ln:[["pass","M84,33 L84,52"],["skate","M105,42.5 Q86,40 92,34 Q104,40 130,44"],["pass","M89,56 L114,46"],["skate","M115,15 Q140,16 160,22"],["skate","M115,70 Q140,70 160,64"]]},
+  steps:["The coach passes to a D in the neutral zone. She passes across to her partner (D-to-D).","The forwards swing back and turn up ice, timing it to hit the puck with speed.","The D passes to a swinging forward, and the line attacks the zone together."],
+  tips:"Forwards: time your swing so you're moving fast when the pass comes. Defenders: look up and pass quickly. Make sure everyone enters onside."},
+ {id:"secondsave",name:"Second-Save Rebounds",cat:"Goalie",lv:"a",min:10,players:"Goalie + 2 shooters",
+  view:HALF,
+  draw:{pl:[[150,42.5,""],[176,66,""],[186,42.5,"G"]],ln:[["shot","M155,42.5 L184,42.5"],["shot","M178,61 L185,48"]]},
+  steps:["One shooter shoots from the slot.","Right after the first shot, a second shooter at the side shoots a loose puck.","The goalie makes the first save, then recovers and squares up for the second shot."],
+  tips:"Steer rebounds to the corners when you can. After the first save, find the puck fast and push with your lead leg to get set."},
+ {id:"screens",name:"Seeing Through Screens",cat:"Goalie",lv:"a",min:10,players:"Goalie, point shooter, screener",
+  view:HALF,
+  draw:{pl:[[130,30,""],[176,42.5,"X"],[186,42.5,"G"]],ln:[["shot","M134,32 L184,42"]]},
+  steps:["A player stands in front of the net to block the goalie's view.","A shooter at the point shoots low.","The goalie looks around the screen to find the puck and make the save."],
+  tips:"Look around the screen, not over it. Find the shooter's blade, get low, and stay big and square."},
+ /* ---- Added: more for every category ---- */
+ {id:"relay",name:"Relay Race",cat:"Skating",lv:"b",min:8,players:"Teams of 4–6",
+  view:FULL,
+  draw:{pl:[[12,28,""],[12,57,""]],ln:[["skate","M17,26 L70,26"],["skate","M70,31 L18,31"],["skate","M17,55 L70,55"],["skate","M70,60 L18,60"]]},
+  steps:["Split into teams, each lined up on the goal line.","The first player skates to the far blue line, stops, and skates back to tag the next player.","First team done wins. Next round, everyone carries a puck."],
+  tips:"Stop hard at the line instead of curving around it. Cheer for your team!"},
+ {id:"shuffle",name:"Shuffle & Sprint",cat:"Skating",lv:"i",min:8,players:"One at a time + goalie",
+  view:HALF,
+  draw:{pl:[[126,21,""],[186,42.5,"G"]],ln:[["back","M126,27 L126,58"],["skate","M130,61 Q150,58 172,48"],["shot","M174,47 L186,43.5"]]},
+  steps:["Start on the blue line facing the net.","Shuffle sideways along the line with side steps, without crossing your feet.","On the whistle, explode forward to the net and shoot."],
+  tips:"Stay low in the shuffle and keep your shoulders square to the net. Make your first three strides short and fast."},
+ {id:"glides",name:"One-Foot Glides",cat:"Skating",lv:"i",min:8,players:"Whole team, in waves",
+  view:FULL,
+  draw:{pl:[[11,20,""],[11,42.5,""],[11,65,""]],ln:[["skate","M16,20 L184,20"],["skate","M16,42.5 L184,42.5"],["skate","M16,65 L184,65"]]},
+  steps:["Skate hard from the goal line to the blue line to build speed.","Glide on one foot as far as you can, and switch feet at the red line.","Next round: glide on one foot while pushing C-cuts with the other."],
+  tips:"Keep your weight over the glide foot with the knee bent and your stick out front. Wobbling is normal. That's how your legs get stronger."},
+ {id:"fivecircles",name:"Five-Circle Crossovers",cat:"Skating",lv:"a",min:8,players:"One at a time, timed",
+  view:FULL,
+  draw:{pl:[[18,8,""]],ln:[["skate","M31,5.5 A15,15 0 1,1 29,5.6"],["skate","M31,49.5 A15,15 0 1,1 29,49.6"],["skate","M100,27.5 A15,15 0 1,1 98,27.6"],["skate","M169,5.5 A15,15 0 1,1 167,5.6"],["skate","M169,49.5 A15,15 0 1,1 167,49.6"]]},
+  steps:["Skate crossovers around all five faceoff circles in order: one end, center ice, then the other end.","Do one full lap around each circle before going to the next.","The coach times it. Try to beat your best time."],
+  tips:"Stay low and wide on every crossover. Look at the next circle as you leave the one you're on."},
+
+ {id:"widenarrow",name:"Wide & Narrow Dribble",cat:"Puck Handling",lv:"b",min:6,players:"Whole team, in waves",
+  view:FULL,
+  draw:{pl:[[11,42.5,""]],ln:[["skate","M16,42.5 Q30,31 45,42.5 Q60,54 75,42.5 Q90,31 105,42.5 Q120,54 135,42.5 Q150,31 165,42.5 Q175,50 183,42.5"]]},
+  steps:["Skate the length of the ice, moving the puck from side to side.","First trip: wide moves, as far as your arms can reach.","Second trip: narrow, quick moves close to your body."],
+  tips:"Roll your wrists to cup the puck on both sides. Eyes up, feet moving."},
+ {id:"numbers",name:"Heads-Up Numbers",cat:"Puck Handling",lv:"b",min:6,players:"Whole team + coach",
+  view:HALF,
+  draw:{pl:[[130,25,""],[130,42.5,""],[130,60,""],[178,42.5,"X"]],ln:[["skate","M135,25 L152,25"],["skate","M135,42.5 L152,42.5"],["skate","M135,60 L152,60"]]},
+  steps:["Everyone stickhandles in place or skates slowly toward the coach.","The coach holds up some fingers. Call out the number without losing your puck.","Next: the coach points left or right, and everyone moves that way with the puck."],
+  tips:"If you have to look down to keep the puck, slow your hands down until you don't."},
+ {id:"boardprotect",name:"Boards Puck Protection",cat:"Puck Handling",lv:"i",min:8,players:"Pairs",
+  view:HALF,
+  draw:{pl:[[128,78,"F"],[132,67,"X"]],ln:[["skate","M133,78.5 L178,78.5"],["skate","M137,67.5 L168,73"]]},
+  steps:["One player skates along the boards with the puck on the boards side.","A partner skates alongside and tries to reach in with the stick.","Protect the puck all the way to the goal line, then switch."],
+  tips:"Keep the puck on your far side, away from the defender. Wide stance, knees bent, and use your body as a wall."},
+ {id:"obstacle",name:"Obstacle Course",cat:"Puck Handling",lv:"a",min:10,players:"One at a time, timed",
+  view:HALF,
+  draw:{cones:[[115,20],[127,20],[139,20],[163,38],[150,64]],pl:[[104,20,""],[186,42.5,"G"]],
+        ln:[["skate","M109,20 Q115,12 121,20 Q127,28 133,20 Q139,12 145,20 L158,33 Q167,46 158,50 L147,61 Q141,72 155,68 L170,50"],["shot","M172,48 L186,44"]]},
+  steps:["Weave through the cones, then make a tight turn around the next cone one way and the last cone the other way.","Add a stick lying on the ice: push the puck under it while you step over.","Finish with a shot. The coach times each run."],
+  tips:"Speed only counts if you keep the puck. Go slow and clean first, then speed up."},
+
+ {id:"circlepass",name:"Circle Passing",cat:"Passing",lv:"b",min:8,players:"Groups of 5–6",
+  view:HALF,
+  draw:{pl:[[169,6,""],[182,13,""],[182,28,""],[169,35,""],[156,28,""],[156,13,""]],ln:[["pass","M169,11 L169,30"],["pass","M160,15.5 L178,26"],["pass","M178,15.5 L160,26"]]},
+  steps:["Stand around a faceoff circle with one puck.","Call a player's name, then pass across the circle to them.","When it gets easy, add a second puck."],
+  tips:"Call the name, look, then pass. Catch with soft hands so the puck stops on your blade."},
+ {id:"monkey",name:"Monkey in the Middle",cat:"Passing",lv:"i",min:8,players:"Groups of 3",
+  view:HALF,
+  draw:{pl:[[135,24,"A"],[135,61,"B"],[137,42.5,"X"]],ln:[["pass","M131,29 Q124,42.5 131,56"],["pass","M140,56 Q148,42.5 140,29"]]},
+  steps:["Two passers stand about 5 stick-lengths apart, with a player in the middle.","The passers keep the puck away by passing and moving.","If the middle player touches the puck, the passer who lost it goes in the middle."],
+  tips:"Move to open space before the puck comes to you. Fake a pass to freeze the player in the middle."},
+ {id:"twoline",name:"Two-Line Passing Rush",cat:"Passing",lv:"i",min:10,players:"Pairs + goalie",
+  view:FULL,
+  draw:{pl:[[12,25,"A"],[12,60,"B"],[186,42.5,"G"]],
+        ln:[["skate","M17,25 L168,31"],["skate","M17,60 L164,55"],["pass","M45,27 L60,57"],["pass","M95,57 L110,29"],["pass","M140,30 L150,55"],["shot","M167,53 L186,44"]]},
+  steps:["Two lines start on the goal line, one on each side of the ice.","Skate down the ice together, passing back and forth.","Make at least 4 passes before the far blue line, then shoot."],
+  tips:"Pass ahead of your partner so they skate into the puck. Keep your stick on the ice as a target."},
+ {id:"droppass",name:"Drop Pass & Cross",cat:"Passing",lv:"a",min:10,players:"Pairs + goalie",
+  view:HALF,
+  draw:{pl:[[106,30,"A"],[106,58,"B"],[186,42.5,"G"]],
+        ln:[["skate","M111,31 Q128,38 140,46 L156,58"],["skate","M111,57 Q124,52 136,45 Q148,34 168,33"],["shot","M171,34 L186,41"]]},
+  steps:["The puck carrier skates across the middle toward the other side.","The partner crosses behind.","As they cross, the carrier leaves the puck in place (a drop pass) and keeps going, and the partner picks it up and attacks."],
+  tips:"Leave the puck dead still; don't push it backward. Call \"Drop!\" so your partner knows it's there."},
+
+ {id:"targets",name:"Corner Targets",cat:"Shooting",lv:"b",min:10,players:"One line, empty net",
+  view:HALF,
+  draw:{cones:[[189.5,40],[189.5,45]],pl:[[160,42.5,""],[150,42.5,""],[140,42.5,""]],ln:[["shot","M165,42 L188,40.3"]]},
+  steps:["Put cones or targets in the corners of an empty net.","Shoot from the slot and try to hit a target.","Keep score: one point for each target you hit."],
+  tips:"Look at the target, then the puck, then shoot. Your stick should point at the target when you finish."},
+ {id:"snapwing",name:"Snap Shot Off the Wing",cat:"Shooting",lv:"i",min:10,players:"One line + goalie",
+  view:HALF,
+  draw:{pl:[[106,72,""],[186,42.5,"G"]],ln:[["skate","M111,72 Q140,72 152,62"],["shot","M155,60 L185,46"]]},
+  steps:["Skate down the wing with the puck at full speed.","At the top of the faceoff circle, take a snap shot without slowing down.","Aim for the far side of the net."],
+  tips:"Short backswing, quick snap of the wrists, weight onto your front foot. Don't glide before you shoot."},
+ {id:"wraps",name:"Wraparounds",cat:"Shooting",lv:"i",min:8,players:"One line + goalie",
+  view:HALF,
+  draw:{pl:[[176,73,""],[186,42.5,"G"]],ln:[["skate","M181,72 Q197,70 197,50 Q197,35 190,36"]]},
+  steps:["Start in the corner with a puck.","Skate hard behind the net and try to stuff the puck in at the far post before the goalie gets there.","Switch corners each turn."],
+  tips:"Protect the puck with your body and stay tight to the net. Speed beats the goalie, so don't slow down behind the net."},
+ {id:"threepucks",name:"Three Pucks, Five Seconds",cat:"Shooting",lv:"a",min:8,players:"One at a time + goalie",
+  view:HALF,
+  draw:{pl:[[160,42.5,""],[186,42.5,"G"]],ln:[["shot","M165,38 L185,41"],["shot","M166,42.5 L185,42.5"],["shot","M165,47 L185,44"]]},
+  steps:["Line up three pucks across the slot.","On the whistle, shoot all three as fast as you can.","The coach counts to five. Any puck still there doesn't count."],
+  tips:"Shoot, step, shoot. Find the next puck with your stick before your eyes get there."},
+
+ {id:"linechange",name:"Line Changes on the Fly",cat:"Team Play",lv:"b",min:10,players:"Whole team",
+  view:"-2 -10 204 97",
+  draw:{pl:[[94,-6,""],[106,-6,""],[60,32,""],[130,30,"X"]],ln:[["skate","M64,29 Q80,10 91,1"],["skate","M107,-1 Q116,14 126,27"]]},
+  steps:["Play a simple 3-on-3 or keep-away game.","On the coach's whistle, the players on the ice skate hard to the bench.","The next player can only jump on when the tired player is close to the bench door."],
+  tips:"Change when the puck is heading away from your net. Short shifts, skate hard, and get off."},
+ {id:"backcheck",name:"Backcheck Hustle",cat:"Team Play",lv:"i",min:10,players:"Pairs + two goalies",
+  view:FULL,
+  draw:{pl:[[150,40,"F"],[160,62,"X"],[186,42.5,"G"],[12,42.5,"G"]],ln:[["shot","M155,40 L185,42"],["skate","M155,62 Q100,70 40,55"],["skate","M145,42 Q100,46 45,50"]]},
+  steps:["A forward takes a shot on one net.","Right away, the coach passes a puck to a player heading the other way.","The shooter turns and races back to catch the puck carrier before they can shoot on the other net."],
+  tips:"Turn and go the second you shoot. Get to the inside, between the puck carrier and the net, and lift the stick."},
+ {id:"netfront",name:"Net-Front Positioning",cat:"Team Play",lv:"i",min:10,players:"F, D, point shooter, goalie",
+  view:HALF,
+  draw:{pl:[[178,49,"F"],[173,41,"D"],[128,24,""],[186,42.5,"G"]],ln:[["shot","M132,26 L183,42"]]},
+  steps:["A forward stands in front of the net to screen and tip shots.","A defender works to get inside position, between the forward and the net, and tie up the forward's stick.","A shooter at the point takes low shots. Switch roles after 5 shots."],
+  tips:"Defenders: win with body position and your stick, not your hands. Find the rebound. Forwards: keep moving and stay in the goalie's eyes."},
+ {id:"lowzone",name:"Low-Zone 3-on-3",cat:"Team Play",lv:"a",min:12,players:"Two teams of 3 + coach",
+  view:HALF,
+  draw:{pl:[[178,72,""],[164,58,""],[168,28,""],[183,62,"X"],[174,48,"X"],[158,40,"X"],[186,42.5,"G"],[130,20,"X"]],ln:[["pass","M175,70 L167,61"],["shot","M168,56 L185,45"]]},
+  steps:["Play 3-on-3 below the faceoff dots in one end.","When the defending team wins the puck, they must pass to the coach at the point before they can attack.","Short 30-second shifts."],
+  tips:"Attackers: cycle the puck and get to the net. Defenders: one player on the puck, one in front, one covering the slot."},
+
+ {id:"stance",name:"Ready Stance & Tracking",cat:"Goalie",lv:"b",min:6,players:"Goalie + coach",
+  view:"148 12 56 61",
+  draw:{pl:[[184,42.5,"G"],[160,30,"X"]],ln:[["skate","M160,35 Q154,45 160,56"],["skate","M184,38 L184,47"]]},
+  steps:["Get in your ready stance: feet shoulder-width apart, knees bent, gloves out front, stick on the ice.","The coach slowly moves a puck around the slot.","Make small shuffles so your chest always faces the puck."],
+  tips:"Point your belly button at the puck. Stay balanced so you could move either way."},
+ {id:"gloveblocker",name:"Glove & Blocker Saves",cat:"Goalie",lv:"b",min:8,players:"Goalie + coach",
+  view:"148 12 56 61",
+  draw:{pl:[[184,42.5,"G"],[160,42.5,"X"]],ln:[["shot","M164,41 L180,36"],["shot","M164,44 L180,49"]]},
+  steps:["The coach takes soft shots (or tosses tennis balls) to your glove side, then your blocker side.","Catch the glove shots. Steer the blocker saves to the corner.","Speed it up as you get comfortable."],
+  tips:"Watch the puck all the way into your glove. Keep your gloves out in front of your body, not at your sides."},
+ {id:"rebounds",name:"Rebound Control",cat:"Goalie",lv:"i",min:8,players:"Goalie + shooter",
+  view:"148 12 56 61",
+  draw:{pl:[[184,42.5,"G"],[160,42.5,""]],ln:[["shot","M164,42.5 L180,42.5"],["pass","M183,47 L192,60"]]},
+  steps:["The coach shoots low at your pads.","Angle your pads and stick to send the rebound into the corner, away from the slot.","Then shots to your chest: smother the puck and hold on."],
+  tips:"Rebounds in front of the net are dangerous. Low shots go to the corners; shots to your body, you hold."},
+ {id:"breakawaysave",name:"Breakaway Saves",cat:"Goalie",lv:"i",min:10,players:"Goalie + skaters",
+  view:HALF,
+  draw:{pl:[[110,42.5,""],[186,42.5,"G"]],ln:[["skate","M115,42.5 L168,42.5"],["skate","M182,46 L175,46"]]},
+  steps:["A skater starts at the red line on a breakaway.","Come out to the top of your crease to cut down the angle.","As the skater gets close, back up slowly with them so a deke can't beat you."],
+  tips:"Be patient. Don't go down first. Make the shooter make the first move."},
+ {id:"goaliepuck",name:"Goalie Puck Handling",cat:"Goalie",lv:"a",min:8,players:"Goalie + D + coach",
+  view:"-2 -2 104 89",
+  draw:{pl:[[13,46,"G"],[24,70,"D"]],ln:[["pass","M95,16 Q40,0 9,31"],["skate","M12,41 L8,35"],["pass","M8,38 Q10,55 20,66"]]},
+  steps:["The coach dumps the puck around the boards behind your net.","Leave your crease, stop the puck behind the net, and leave it for your defense or pass it to a D in the corner.","Get back to your crease fast."],
+  tips:"Talk to your D: \"Leave it!\" or \"Rim!\" Only play the puck when it's safe. If you're not sure, stay in your net."}
+];
+
+const CATS=["All","Skating","Puck Handling","Passing","Shooting","Team Play","Goalie"];
+let cat="All",lvl="all",done={};
+const LVN={b:"Beginner",i:"Intermediate",a:"Advanced",all:"All levels"};
+try{done=JSON.parse(localStorage.getItem("icetime-done")||"{}")||{};}catch(e){done={};}
+
+function drillSVG(d){
+  const pl=(d.draw.pl||[]).map(([x,y,l])=>{
+    const isG=l==="G",isX=l==="X"||l==="S";
+    const col=isG?"#d9930f":isX?"#56677a":l==="D"?"#1f4fa3":"#d92f49";
+    return `<circle cx="${x}" cy="${y}" r="3.6" fill="${col}" stroke="#fff" stroke-width=".6"/>${l?`<text x="${x}" y="${y}" font-size="3.4" font-weight="800" fill="#fff" text-anchor="middle" dominant-baseline="central" font-family="Barlow Condensed,Arial Narrow,sans-serif">${l}</text>`:""}`;}).join("");
+  const cones=(d.draw.cones||[]).map(([x,y])=>`<path d="M${x},${y-2.2}L${x+1.8},${y+1.6}L${x-1.8},${y+1.6}Z" class="cone"/>`).join("");
+  const ln=d.draw.ln.map(([t,p])=>`<path d="${p}" class="dl dl-${t}" marker-end="url(#d-${t==='back'?'skate':t})"/>`).join("");
+  return `<svg viewBox="${d.view}" role="img" aria-label="Diagram for ${d.name}">
+    <defs>${["skate","pass","shot"].map(k=>`<marker id="d-${k}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="${k==='skate'?'#0f1d2e':k==='pass'?'#2b5fb8':'#d6334a'}"/></marker>`).join("")}</defs>
+    ${rinkBase().replace(/<defs>[\s\S]*?<\/defs>/,'<defs><clipPath id="iceclip"><rect x="0" y="0" width="200" height="85" rx="28"/></clipPath></defs>')}
+    ${cones}${ln}${pl}</svg>`;
+}
+
+function renderDrills(){
+  const list=DRILLS.filter(d=>(cat==="All"||d.cat===cat)&&(lvl==="all"||d.lv===lvl));
+  const LO={b:0,i:1,a:2};list.sort((x,y)=>CATS.indexOf(x.cat)-CATS.indexOf(y.cat)||LO[x.lv]-LO[y.lv]);
+  if(!list.length){document.getElementById("drillgrid").innerHTML=`<p class="lede">No ${LVN[lvl]} drills in ${cat} yet. Try another level.</p>`;updateProgress();return;}
+  document.getElementById("drillgrid").innerHTML=list.map(d=>`
+    <article class="card drill ${done[d.id]?"isdone":""}">
+      ${drillSVG(d)}
+      <div class="db">
+        <h3>${d.name}</h3>
+        <div class="meta"><span class="pill lv-${d.lv}">${LVN[d.lv]}</span><span class="pill">${d.cat}</span><span class="pill">${d.min} min</span><span class="pill">${d.players}</span></div>
+        <ol>${d.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+        <div class="tips"><b>Coach's tip:</b> ${d.tips}</div>
+        <label class="done"><input type="checkbox" id="done-${d.id}" data-id="${d.id}" ${done[d.id]?"checked":""}> I can do this one!</label>
+      </div>
+    </article>`).join("");
+  document.querySelectorAll("#drillgrid input[type=checkbox]").forEach(cb=>cb.addEventListener("change",e=>{
+    const id=e.target.dataset.id;if(e.target.checked)done[id]=1;else delete done[id];
+    try{localStorage.setItem("icetime-done",JSON.stringify(done));}catch(err){}
+    e.target.closest(".drill").classList.toggle("isdone",e.target.checked);updateProgress();}));
+  updateProgress();
+}
+function updateProgress(){
+  const n=DRILLS.filter(d=>done[d.id]).length;
+  document.getElementById("doneCount").textContent=`${n} of ${DRILLS.length} drills done`;
+  document.getElementById("pfill").style.width=(n/DRILLS.length*100)+"%";
+}
+function initDrills(){
+  const c=document.getElementById("cats");
+  CATS.forEach(k=>{const b=document.createElement("button");b.className="chipbtn";b.textContent=k;b.setAttribute("aria-pressed",k===cat);
+    b.addEventListener("click",()=>{cat=k;c.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x.textContent===k));renderDrills();});c.appendChild(b);});
+  const L=document.getElementById("levels");
+  ["all","b","i","a"].forEach(k=>{const b=document.createElement("button");b.className="chipbtn sm";b.dataset.lv=k;b.textContent=LVN[k];b.setAttribute("aria-pressed",k===lvl);
+    b.addEventListener("click",()=>{lvl=k;L.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.lv===k));renderDrills();});L.appendChild(b);});
+  renderDrills();
+}
+
+/* ---------- Rules ---------- */
+const RULES=[
+ {h:"How a game works",p:["Each team has 6 players on the ice: 3 forwards, 2 defense, and 1 goalie. Everyone else waits on the bench for a line change.","Games are split into 3 periods. The team with the most goals at the end wins."],tip:"Shifts are short! Skate hard, then change so a fresh line can go out."},
+ {h:"Offside",p:["When your team carries the puck into the other team's end, the puck has to cross their blue line before you do.","If a player goes in ahead of the puck, the ref blows the whistle and there's a faceoff outside the zone."],tip:"Watch the puck, not the line. If the puck isn't in yet, wait at the blue line.",svg:"offside"},
+ {h:"Icing",p:["If you shoot the puck from your side of the red line and it slides all the way past the other team's goal line without anyone touching it, that's icing.","Play stops, and the faceoff comes back to your end. It's allowed when your team is short a player because of a penalty."],tip:"Don't just throw the puck away. Make a pass or skate it out.",svg:"icing"},
+ {h:"No body checking",p:["In girls' and women's hockey, body checking (hitting a player on purpose to knock her off the puck) is not allowed.","You can still battle for the puck. Use good position, angle her toward the boards, and use your stick to take the puck."],tip:"Position and stick work win the puck, not hitting."},
+ {h:"Penalties",p:["Breaking a safety rule sends a player to the penalty box for a set time. Common penalties: tripping, slashing, hooking, holding, high-sticking, and body checking.","While she sits, her team plays short-handed (the penalty kill), and the other team has a power play."],tip:"Keep your stick down and move your feet. Most penalties happen when you get lazy and reach."},
+ {h:"Faceoffs",p:["Play starts with a faceoff after every whistle. There are 9 faceoff spots on the ice, and the ref picks the one closest to where play stopped.","Only the two centers can be in the middle of the circle. Everyone else waits outside it until the puck drops."],tip:"Wingers: don't move in early, or your center gets kicked out of the faceoff."}
+];
+const GLOSS=[
+ ["Slot","The area right in front of the net, between the faceoff circles. The best place to score from."],
+ ["Point","The spot at the other team's blue line where your defense stands when you're attacking."],
+ ["Crease","The blue painted area in front of the net. It's the goalie's space."],
+ ["Boards","The walls around the rink."],
+ ["Hash marks","The short lines on the sides of the faceoff circles. A good spot for wingers on a breakout."],
+ ["Breakout","Moving the puck out of your own end to start an attack."],
+ ["Forecheck","Chasing the other team in their end to win the puck back."],
+ ["Backcheck","Skating hard back to your own end to help on defense."],
+ ["Line change","Swapping players on the fly from the bench."],
+ ["Power play","When your team has more players because the other team has a penalty."],
+ ["Penalty kill","Playing with fewer players because your team got a penalty."],
+ ["Rebound","A puck that bounces off the goalie. Great chance to score!"],
+ ["Five-hole","The space between the goalie's legs."],
+ ["Top shelf","A shot into the top of the net."],
+ ["Hat trick","Scoring 3 goals in one game."],
+ ["Biscuit","Another word for the puck."],
+ ["Dangle","Fancy stickhandling around a player."],
+ ["Wheel","Skate around the back of the net with the puck."]
+];
+function miniRink(kind){
+  const base=rinkBase().replace(/<defs>[\s\S]*?<\/defs>/,`<defs><clipPath id="iceclip"><rect x="0" y="0" width="200" height="85" rx="28"/></clipPath><marker id="r-a" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0L10,5L0,10z" fill="#d6334a"/></marker><marker id="r-b" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0L10,5L0,10z" fill="#0f1d2e"/></marker></defs>`);
+  if(kind==="offside") return `<svg viewBox="70 -8 132 101" role="img" aria-label="Offside diagram: player crosses the blue line before the puck">${base}
+    <circle cx="131" cy="30" r="3.6" fill="#d92f49" stroke="#fff" stroke-width=".6"/><text x="131" y="22" font-size="4" text-anchor="middle" fill="#d6334a" font-weight="700" font-family="Atkinson Hyperlegible,sans-serif">Offside!</text>
+    <circle cx="112" cy="55" r="3.6" fill="#d92f49" stroke="#fff" stroke-width=".6"/><circle cx="117" cy="55" r="1.4" fill="#111"/>
+    <circle cx="140" cy="60" r="3.6" fill="#d92f49" stroke="#fff" stroke-width=".6" opacity=".35"/><path d="M118,58 L136,60" stroke="#0f1d2e" stroke-width=".8" fill="none" marker-end="url(#r-b)"/>
+    <text x="142" y="72" font-size="3.6" fill="#155c2f" font-weight="700" font-family="Atkinson Hyperlegible,sans-serif">OK: puck goes in first</text>
+    <text x="125" y="91" font-size="3.4" text-anchor="middle" fill="#2b5fb8" font-weight="700" font-family="Atkinson Hyperlegible,sans-serif">their blue line</text></svg>`;
+  return `<svg viewBox="-2 -2 204 89" role="img" aria-label="Icing diagram: puck shot from behind the red line past the far goal line">${base}
+    <circle cx="60" cy="55" r="1.4" fill="#111"/><path d="M62,54 L196,30" stroke="#d6334a" stroke-width="1.1" fill="none" marker-end="url(#r-a)"/>
+    <text x="40" y="66" font-size="4" fill="#0f1d2e" font-weight="700" font-family="Atkinson Hyperlegible,sans-serif">shot from your side</text>
+    <text x="160" y="20" font-size="4" fill="#d6334a" font-weight="700" font-family="Atkinson Hyperlegible,sans-serif" text-anchor="middle">nobody touched it = icing</text></svg>`;
+}
+function initRules(){
+  document.getElementById("rulegrid").innerHTML=RULES.map(r=>`<div class="card rule"><h3>${r.h}</h3>${r.p.map(x=>`<p>${x}</p>`).join("")}${r.svg?miniRink(r.svg):""}<p class="tip">${r.tip}</p></div>`).join("");
+  document.getElementById("gloss").innerHTML=GLOSS.map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join("");
+}
+
+/* ---------- Routing ---------- */
+const VIEWS=["positions","drills","rules"];
+function route(){
+  let v=(location.hash||"").slice(1);if(!VIEWS.includes(v))v="positions";
+  VIEWS.forEach(k=>document.getElementById("v-"+k).classList.toggle("on",k===v));
+  document.querySelectorAll("nav a").forEach(a=>{if(a.dataset.view===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
+}
+window.addEventListener("hashchange",route);
+initPositions();initDrills();initRules();route();
+
+/* ---------- Install as an app ---------- */
+(function(){
+  const btn=document.getElementById("installBtn"), sheet=document.getElementById("iosSheet");
+  const standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
+  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  let deferred=null;
+  if(!standalone){
+    window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;btn.classList.add("show");});
+    if(isIOS) btn.classList.add("show");
+  }
+  btn.addEventListener("click",async()=>{
+    if(deferred){deferred.prompt();try{await deferred.userChoice;}catch(e){}deferred=null;btn.classList.remove("show");}
+    else if(isIOS){sheet.classList.add("show");document.getElementById("iosClose").focus();}
+  });
+  document.getElementById("iosClose").addEventListener("click",()=>sheet.classList.remove("show"));
+  sheet.addEventListener("click",e=>{if(e.target===sheet)sheet.classList.remove("show");});
+  window.addEventListener("appinstalled",()=>btn.classList.remove("show"));
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{});});
+  }
+})();
+</script>
+</body>
+</html>

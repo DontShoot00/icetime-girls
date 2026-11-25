@@ -1,0 +1,17 @@
+{
+  "name": "Ice Time Playbook",
+  "short_name": "Ice Time",
+  "description": "Learn where to be on the ice, practice drills, and learn the rules of hockey.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f1d2e",
+  "theme_color": "#0f1d2e",
+  "lang": "en",
+  "categories": ["sports", "education"],
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

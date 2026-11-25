@@ -1,0 +1,28 @@
+ICE TIME PLAYBOOK: HOW TO PUT YOUR APP ONLINE (free, about 5 minutes)
+
+1. Unzip this file. You'll get a folder called "icetime-app".
+2. On a computer, go to:  https://app.netlify.com/drop
+3. Drag the whole "icetime-app" folder onto the page.
+4. Netlify gives you a link ending in ".netlify.app". Your app is live.
+5. IMPORTANT: Sign up for a free Netlify account and claim the site right away.
+   If you don't, Netlify deletes it within about an hour.
+6. Optional: in Netlify, go to Site settings > Change site name
+   to get a nicer link, like  icetime-hockey.netlify.app
+
+HOW PLAYERS INSTALL IT
+- iPhone/iPad: open the link in Safari, tap "Install app" and follow the steps
+  (Share button > Add to Home Screen).
+- Android: open the link in Chrome and tap "Install app".
+- After installing, it opens from the home screen like any app and works
+  at the rink with no signal.
+
+UPDATING THE APP LATER
+- Ask Claude for the change. You'll get a new folder.
+- In Netlify, open your site > Deploys, and drag the new folder onto the
+  drop area. Players get the update the next time they open the app with internet.
+
+WHAT'S IN THE FOLDER (don't rename these)
+- index.html            the app
+- manifest.webmanifest  the app's name, icon and colors
+- sw.js                 makes it work offline
+- icons/                the home-screen icons
